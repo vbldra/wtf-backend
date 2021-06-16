@@ -3,12 +3,30 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+var mongoose = require("mongoose");
+
+
 var cors = require("cors");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var apiRouter = require("./routes/api");
 var app = express();
 require("dotenv").config();
+
+// connect to the database
+mongoose.connect(
+  "mongodb+srv://wtfPeople:wirTreffenFreunde@cluster0.shexe.mongodb.net/wtf?retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  }
+);
+
+mongoose.connection.on("error", console.error);
+mongoose.connection.on("open", function () {
+  console.log("Database connection established...");
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
