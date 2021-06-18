@@ -1,4 +1,4 @@
-const { JsonWebTokenError } = require("jsonwebtoken");
+const JsonWebTokenError = require("jsonwebtoken");
 
 exports.authenticate = (req, res, next) => {
   const authHeader = req.headers["authorization"];
@@ -10,7 +10,8 @@ exports.authenticate = (req, res, next) => {
     process.env.ACCESS_TOKEN_SECRET,
     (err, user) => {
       if (err) return res.sendStatus(403);
-      req.userId = user;
+      req.userId = user.user;
+      console.log("autheticated user with id: " + user.user);
       next();
     }
   );

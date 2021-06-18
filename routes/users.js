@@ -1,12 +1,19 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const { addUser, deleteUser, updateUser, loginUser } = require("../controllers/userControllers")
+const { authenticate } = require("../middlewares/authentication");
+const {
+  addUser,
+  deleteUser,
+  updateUser,
+  loginUser,
+} = require("../controllers/userControllers");
 
 //user routes
-router.route("/").post(addUser);
-router.route("/:id").delete(deleteUser).put(updateUser);
+router
+  .route("/")
+  .post(addUser)
+  .delete(authenticate, deleteUser)
+  .put(authenticate, updateUser);
 router.route("/login").post(loginUser);
 
 module.exports = router;
- // login, logout, relogin, middleware authentication + authorization,
- 
