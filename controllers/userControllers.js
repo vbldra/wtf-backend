@@ -13,9 +13,9 @@ exports.addUser = async (req, res, next) => {
     }
 
     const user = new User(req.body);
-    const token = crypto.randomBytes(30).toString("hex");
+    // const token = crypto.randomBytes(30).toString("hex");
     user.password = await bcrypt.hash(user.password, 10);
-    user.token = token;
+    // user.token = token;
     await user.save();
     res.status(200).send(user);
   } catch (e) {
@@ -23,9 +23,22 @@ exports.addUser = async (req, res, next) => {
   }
 };
 
+exports.deleteUser = async (req, res, next) => {
+  try {
+    const userId = req.userId;
+    if (!userId) throw new createError.NotFound();
+    await User.deleteOne({ _id: userId }, (err) => {
+      if (err) throw new createError.NotFound();
+    });
+    return res.sendStatus(200);
+  } catch (e) {
+    next(e);
+  }
+};
+
 exports.updateUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    const user = await User.findByIdAndUpdate(req.userId, req.body, {
       new: true,
       runValidators: true,
     });
@@ -36,37 +49,31 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-exports.deleteUser = async (req, res, next) => {
+
+exports.loginUser = async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    console.log("loging in...");
+    const user = await User.findOne({
+      email: req.body.email,
+    }).select("+password");
     if (!user) throw new createError.NotFound();
-    res.status(200).send(user);
+    const isCorrectPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (isCorrectPassword) {
+      // const token = crypto.randomBytes(30).toString("hex");
+      const token = jwt.sign(
+        { user: user._id },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+      res.json({ accessToken: token });
+    } else {
+      throw new createError.Unauthorized();
+    }
   } catch (e) {
     next(e);
   }
 };
 
-exports.loginUser = async(res, req) => {
-    try {
-      const user = await User.findOne({
-        email: req.body.email,
-      }).select("+password");
-      if (!user) throw new createError.NotFound();
-      const isCorrectPassword = await bcrypt.compare(
-        req.body.password,
-        user.password
-      );
-      if (isCorrectPassword) {
-        // const token = crypto.randomBytes(30).toString("hex");
-        const token = jwt.sign(
-          { user: user._id },
-          process.env.ACCESS_TOKEN_SECRET
-        );
-        res.json({ accessToken: token });
-      } else {
-        next({ message: "Wrong password" });
-      }
-    } catch (e) {
-      next(e);
-    }
-}
+

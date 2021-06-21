@@ -11,4 +11,25 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3000/users/60c9f9ee26c816252603f979
+DELETE http://localhost:3000/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBjYzgxZWM2Yzk4OTY1ODRlOWJiMWZmIiwiaWF0IjoxNjI0MDE2NDMxfQ.bSxe7Sn2BFEVRtEdRqRCE-2OPcMw6lXi-gpruCw3zyw
+
+###
+
+PUT http://localhost:3000/users/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBjYzhkMTdiY2IyYjY2NDY5ZjEzY2U2IiwiaWF0IjoxNjI0MDE5MDA2fQ.dCx2clWCWY1z10R9D7CSCFWfxm17mk5-39SbU4uDIOs
+
+{
+  "firstName": "Piscotel"
+}
+
+###
+
+POST http://localhost:3000/users/login
+Content-Type: application/json
+
+{
+  "email": "x@y.z",
+  "password": "parola"
+}
