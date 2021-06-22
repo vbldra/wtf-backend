@@ -15,18 +15,19 @@ const getCordinates = async (peopleAddresses) => {
         let lat = geoPosition.data.items[0].position.lat;
         let lng = geoPosition.data.items[0].position.lng;
         geoPeopleAddresses.push({ latitude: lat, longitude: lng });
+
         // geolib function to find center of all the points
         // converting back co-ordinates to the address
       }
     }
+    console.log({ geoPeopleAddresses });
     const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
     const middleAddress = await axios(
       `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${keyAPI}&pos=${geoMiddle.latitude},${geoMiddle.longitude},0&mode=retrieveAll&prox=${geoMiddle.latitude},${geoMiddle.longitude},50`
     );
     return middleAddress.data.Response.View[0].Result[0].Location.Address.Label; // Saving the label (city, country and so on)
-    console.log(geoPeopleAddresses);
   } catch (error) {
-    console.error("Unable to load positions", error);
+    throw new Error(error);
   }
 };
 module.exports = getCordinates;
