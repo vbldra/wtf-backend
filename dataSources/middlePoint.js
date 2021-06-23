@@ -25,13 +25,15 @@ const getCoordinates = async (peopleAddresses) => {
     const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
 
     //const geoMiddle = getCenter(geoPeopleAddresses);
-    const middleAddress = await axios.get(
-      `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${keyAPI}&pos=${geoMiddle.latitude},${geoMiddle.longitude},0&mode=retrieveAll&prox=${geoMiddle.latitude},${geoMiddle.longitude},5`
-    );
-    console.log(
-      `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${keyAPI}&pos=${geoMiddle.latitude},${geoMiddle.longitude},0&mode=retrieveAll&prox=${geoMiddle.latitude},${geoMiddle.longitude},5`
-    );
-    return middleAddress.data.Response.View[0].Result[0].Location.Address.Label; // Saving the label (city, country and so on)
+    // const middleAddress = await axios.get(
+    //   `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json?apiKey=${keyAPI}&pos=${geoMiddle.latitude},${geoMiddle.longitude},0&mode=retrieveAll&prox=${geoMiddle.latitude},${geoMiddle.longitude},5`
+    // );
+    // console.log(middleAddress.data.Response.View[0].Result[0].Location);
+    console.log(geoMiddle);
+    return geoMiddle;
+    //return middleAddress.data.Response.View[0].Result[0].Location
+    //.DisplayPosition;
+    //return middleAddress.data.Response.View[0].Result[0].Location; // Saving the label (city, country and so on)
   } catch (error) {
     throw new Error(error);
   }
