@@ -1,5 +1,4 @@
 const { getMiddlePoint } = require("../dataSources/middlePoint");
-const Address = require("../models/Address");
 const { storeCoordinates } = require("../middlewares/storeCoordinates");
 exports.getMiddlePoint = async (req, res, next) => {
   try {

@@ -42,5 +42,7 @@ const getCoordinates = async (peopleAddresses) => {
 exports.getMiddlePoint = async (peopleAddresses) => {
   const geoPeopleAddresses = await getCoordinates(peopleAddresses);
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
+  console.log("geoMiddle", geoMiddle);
+  console.log("geoPeopleAddresses", geoPeopleAddresses);
   return { geoMiddle, geoPeopleAddresses };
 };
