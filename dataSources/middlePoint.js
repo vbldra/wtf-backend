@@ -1,6 +1,6 @@
 const { default: axios } = require("axios");
 
-const { getCenterOfBounds } = require("geolib");
+const { getCenterOfBounds, getBounds } = require("geolib");
 const { getCenter } = require("geolib");
 require("dotenv").config();
 const keyAPI = process.env.API_KEY;
@@ -22,8 +22,16 @@ const getCoordinates = async (peopleAddresses) => {
         }
         // geolib function to find center of all the points
         const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
-        console.log(geoPeopleAddresses);
-        const sharingData = [{ middlePoint: geoMiddle, peopleAddresses: geoPeopleAddresses }];
+        // geolib function to find min and max of the bounds of coordinates
+        const geoBoundsAddresses = getBounds(geoPeopleAddresses);
+
+        const sharingData = [
+            {
+                middlePoint: geoMiddle,
+                peopleAddresses: geoPeopleAddresses,
+                boundsAddresses: geoBoundsAddresses,
+            },
+        ];
         return sharingData;
 
         //const geoMiddle = getCenter(geoPeopleAddresses);
