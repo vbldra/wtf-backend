@@ -1,5 +1,6 @@
 const { Router } = require("express");
 const router = Router();
-const getData = require("../controllers/apiRequestController");
-router.post("/", getData);
+const { getMiddlePoint } = require("../controllers/apiRequestController");
+
+router.post("/", getMiddlePoint);
 module.exports = router;

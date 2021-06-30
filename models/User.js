@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const AddressSchema = require("./Address");
 
 const UserSchema = new Schema(
   {
@@ -19,7 +20,7 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
-    address: String,
+    //address: AddressSchema,
   },
   {
     toObject: {
