@@ -1,10 +1,14 @@
-var getCordinates = require("../dataSources/middlePoint");
-const getData = async (req, res) => {
+const { getMiddlePoint } = require("../dataSources/middlePoint");
+const { storeCoordinates } = require("../middlewares/storeCoordinates");
+exports.getMiddlePoint = async (req, res, next) => {
   try {
-    const cordinates = await getCordinates(req.body);
-    res.json(cordinates);
+    const { geoMiddle, geoPeopleAddresses } = await getMiddlePoint(req.body);
+    req.coordinates = geoPeopleAddresses;
+    res.on("finish", () => {
+      storeCoordinates(geoPeopleAddresses);
+    });
+    res.json(geoMiddle);
   } catch (err) {
     res.status(500);
   }
 };
-module.exports = getData;
