@@ -1,5 +1,5 @@
 const { getMiddlePoint } = require("../dataSources/middlePoint");
-const { storeCoordinates } = require("../middlewares/storeCoordinates");
+const { storeCoordinates } = require("../dataSources/database");
 exports.getMiddlePoint = async (req, res, next) => {
   try {
     const { geoMiddle, geoPeopleAddresses } = await getMiddlePoint(req.body);
@@ -7,7 +7,7 @@ exports.getMiddlePoint = async (req, res, next) => {
     res.on("finish", () => {
       storeCoordinates(geoPeopleAddresses);
     });
-    res.json(geoMiddle);
+    res.json({ geoMiddle: geoMiddle, geoPeopleAddresses: geoPeopleAddresses });
   } catch (err) {
     res.status(500);
   }

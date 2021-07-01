@@ -1,10 +1,11 @@
 const Address = require("../models/Address");
 const axios = require("axios");
 const { getCenterOfBounds } = require("geolib");
+require("dotenv").config();
 const keyAPI = process.env.API_KEY;
-// array for co-ordinates
 
 const getCoordinates = async (peopleAddresses) => {
+  // array for co-ordinates
   const geoPeopleAddresses = [];
   try {
     for (const person in peopleAddresses) {
@@ -19,7 +20,6 @@ const getCoordinates = async (peopleAddresses) => {
             address: peopleAddresses[person],
           });
         } else {
-          // parsing all the input fields to co-ordinates
           console.log("request coords from api");
           const geoPosition = await axios(
             `https://geocode.search.hereapi.com/v1/geocode?q=${peopleAddresses[person]}&apiKey=${keyAPI}`

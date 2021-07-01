@@ -11,7 +11,7 @@ exports.authenticate = (req, res, next) => {
     (err, user) => {
       if (err) return res.sendStatus(403);
       req.userId = user.user;
-      console.log("autheticated user with id: " + user.user);
+      console.log("authenticated user with id: " + user.user);
       next();
     }
   );
