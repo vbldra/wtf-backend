@@ -15,12 +15,17 @@ const UserSchema = new Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
       required: true,
     },
-    //address: AddressSchema,
+    promotions: {
+      type: Boolean,
+      default: false,
+    },
+    address: String,
   },
   {
     toObject: {
