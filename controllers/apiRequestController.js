@@ -1,5 +1,5 @@
 const { getMiddlePoint } = require("../dataSources/middlePoint");
-const { storeCoordinates } = require("../middlewares/storeCoordinates");
+const { storeCoordinates } = require("../dataSources/database");
 
 exports.getMiddlePoint = async (req, res, next) => {
   try {
