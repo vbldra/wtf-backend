@@ -22,6 +22,58 @@ exports.addUser = async (req, res, next) => {
     next(e);
   }
 };
+exports.login = (req, res, next) => {
+  User.findOne({ email: req.body.email }).then(
+    (user) => {
+      if (!user) {
+        return res.status(401).json({
+          error: new Error('User not found!')
+        });
+      }
+      bcrypt.compare(req.body.password, user.password).then(
+        (valid) => {
+          if (!valid) {
+            return res.status(401).json({
+              error: new Error('Incorrect password!')
+            });
+          }
+          res.status(200).json({
+            userId: user._id,
+            token: 'token'
+          });
+        }
+      ).catch(
+        (error) => {
+          res.status(500).json({
+            error: error
+          });
+        }
+      );
+    }
+  ).catch(
+    (error) => {
+      res.status(500).json({
+        error: error
+      });
+    }
+  );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 exports.deleteUser = async (req, res, next) => {
   try {
@@ -52,21 +104,26 @@ exports.updateUser = async (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
   try {
-    console.log("loging in...");
+    console.log("logging in...");
     const user = await User.findOne({
       email: req.body.email,
     }).select("+password");
+    console.log(req.body);
+    
+
     if (!user) throw new createError.NotFound();
     const isCorrectPassword = await bcrypt.compare(
       req.body.password,
       user.password
     );
+    
     if (isCorrectPassword) {
       // const token = crypto.randomBytes(30).toString("hex");
       const token = jwt.sign(
         { user: user._id },
         process.env.ACCESS_TOKEN_SECRET
       );
+      
       res.json({ accessToken: token });
     } else {
       throw new createError.Unauthorized();
