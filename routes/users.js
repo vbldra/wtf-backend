@@ -3,6 +3,7 @@ var router = express.Router();
 const { authenticate } = require("../middlewares/authentication");
 const {
   addUser,
+  getUser,
   deleteUser,
   updateUser,
   loginUser,
@@ -11,6 +12,7 @@ const {
 //user routes
 router
   .route("/")
+  .get(authenticate, getUser)
   .post(addUser)
   .delete(authenticate, deleteUser)
   .put(authenticate, updateUser);
