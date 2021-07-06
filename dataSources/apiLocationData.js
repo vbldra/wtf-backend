@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { getCenterOfBounds, getBounds } = require("geolib");
+const { Gone } = require("http-errors");
 const Address = require("../models/Address");
 
 require("dotenv").config();
@@ -60,7 +61,13 @@ const getCoordinates = async (peopleAddresses) => {
 };
 exports.getMiddlePoint = async (peopleAddresses) => {
   console.log({ peopleAddresses });
-  const geoPeopleAddresses = await getCoordinates(peopleAddresses);
+  const geoPeopleAddressesFullArray = await getCoordinates(peopleAddresses);
+  const geoPeopleAddresses = geoPeopleAddressesFullArray.map((element) => {
+    return {
+      latitude: Number(element.latitude),
+      longitude: Number(element.longitude),
+    };
+  });
   console.log(geoPeopleAddresses);
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
