@@ -1,7 +1,11 @@
-const { getMiddlePoint } = require("../dataSources/middlePoint");
-const { storeCoordinates } = require("../middlewares/storeCoordinates");
+const {
+  getMiddlePoint,
+  //getClosestCity,
+} = require("../dataSources/apiLocationData");
 
-exports.getMiddlePoint = async (req, res, next) => {
+const { storeCoordinates } = require("../dataSources/database");
+
+exports.getLocationData = async (req, res) => {
   try {
     const { geoMiddle, geoPeopleAddresses, geoBoundsAddresses } =
       await getMiddlePoint(req.body);
@@ -18,3 +22,12 @@ exports.getMiddlePoint = async (req, res, next) => {
     res.status(500);
   }
 };
+
+// exports.getClosestCity = async (req, res) => {
+//   try {
+//     const locationData = await getClosestCity(req.body);
+//     res.json(locationData);
+//   } catch (err) {
+//     res.status(500);
+//   }
+// };
