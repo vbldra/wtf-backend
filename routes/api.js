@@ -1,6 +1,10 @@
 const { Router } = require("express");
 const router = Router();
-const { getMiddlePoint } = require("../controllers/apiRequestController");
+const {
+  getLocationData,
+  getClosestCity,
+} = require("../controllers/apiRequestController");
 
-router.post("/", getMiddlePoint);
+router.post("/", getLocationData);
+//router.post("/city", getClosestCity);
 module.exports = router;
