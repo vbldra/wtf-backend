@@ -20,7 +20,8 @@ const UserSchema = new Schema(
       required: true,
     },
     address: String,
-    trips: { title: String, cities: [String], middlePoint: String },
+    trips: [{ title: String, cities: [String], middlePoint: String }],
+    memories: [String],
   },
   {
     toObject: {

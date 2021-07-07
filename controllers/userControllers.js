@@ -84,3 +84,11 @@ exports.loginUser = async (req, res, next) => {
     next(e);
   }
 };
+
+exports.uploadMemory = async (req, res, next) => {
+  try {
+    res.sendStatus(200);
+  } catch (e) {
+    next(e);
+  }
+};
