@@ -77,6 +77,16 @@ exports.login = (req, res, next) => {
 
 
 
+exports.getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId).select("-password");
+    if (!user) throw new createError.NotFound();
+    res.status(200).send(user);
+  } catch (e) {
+    next(e);
+  }
+};
+
 exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.userId;
@@ -102,7 +112,6 @@ exports.updateUser = async (req, res, next) => {
     next(e);
   }
 };
-
 
 exports.loginUser = async (req, res, next) => {
   try {
@@ -135,4 +144,10 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-
+exports.uploadMemory = async (req, res, next) => {
+  try {
+    res.sendStatus(200);
+  } catch (e) {
+    next(e);
+  }
+};

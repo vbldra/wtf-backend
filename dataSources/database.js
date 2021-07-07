@@ -1,4 +1,3 @@
-const { address } = require("faker");
 const Address = require("../models/Address");
 
 exports.storeCoordinates = async (coordinates) => {
