@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const AddressSchema = require("./Address");
 
 const UserSchema = new Schema(
   {
@@ -14,10 +15,15 @@ const UserSchema = new Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
       required: true,
+    },
+    promotions: {
+      type: Boolean,
+      default: false,
     },
     address: String,
     trips: [{ title: String, cities: [String], middlePoint: String }],
