@@ -1,12 +1,16 @@
-POST http://localhost:3000/users
+POST http://localhost:8080/users
 Content-Type: application/json
 
 {
-  "firstName": "Muschi",
-  "lastName": "Bär",
-  "email": "x@y.z",
+  "firstName": "Raluca",
+  "lastName": "Stefania",
+  "email": "raluca@stefania.com",
   "password": "parola",
-  "role": "User"
+  "trips": [{
+      "title": "MySecondTRip",
+      "cities": ["Heidelberg", "Hamburg", "München", "Köln"],
+      "middlePoint": "Regensburg"
+      }]
 }
 
 ###
@@ -16,20 +20,29 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBjYzgxZ
 
 ###
 
-PUT http://localhost:3000/users/
+PUT http://localhost:8080/users/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBjYzhkMTdiY2IyYjY2NDY5ZjEzY2U2IiwiaWF0IjoxNjI0MDE5MDA2fQ.dCx2clWCWY1z10R9D7CSCFWfxm17mk5-39SbU4uDIOs
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBlMzAzNDU1MmE4ODA5Yzk2MjcwMjI1IiwiaWF0IjoxNjI1NDkwMjk1fQ.YfpTDhBHrC9pcXzE3BURrnyNtyIv3Y9aENhJtmdshEM
 
 {
-  "firstName": "Piscotel"
+  "trips": [{
+      "title": "MySecondTRip",
+      "cities": ["Heidelberg", "Hamburg", "München", "Köln"],
+      "middlePoint": "Regensburg"
+      }]
 }
 
 ###
 
-POST http://localhost:3000/users/login
+POST http://localhost:8080/users/login
 Content-Type: application/json
 
 {
-  "email": "x@y.z",
+  "email": "raluca@stefania.com",
   "password": "parola"
 }
+
+###
+
+GET  http://localhost:8080/users/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBlMzAzNDU1MmE4ODA5Yzk2MjcwMjI1IiwiaWF0IjoxNjI1NDkwMjk1fQ.YfpTDhBHrC9pcXzE3BURrnyNtyIv3Y9aENhJtmdshEM
