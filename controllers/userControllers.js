@@ -17,6 +17,7 @@ exports.addUser = async (req, res, next) => {
     user.password = await bcrypt.hash(user.password, 10);
     // user.token = token;
     await user.save();
+    delete user.password; // Maxim opinion,florian asked for help
     res.status(200).send(user);
   } catch (e) {
     next(e);
@@ -46,6 +47,7 @@ exports.login = (req, res, next) => {
         (error) => {
           res.status(500).json({
             error: error
+            
           });
         }
       );
