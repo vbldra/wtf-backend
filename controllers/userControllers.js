@@ -2,7 +2,7 @@ const User = require("../models/User");
 const createError = require("http-errors");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 
 exports.addUser = async (req, res, next) => {
