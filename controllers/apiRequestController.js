@@ -7,14 +7,14 @@ const { storeCoordinates } = require("../dataSources/database");
 
 exports.getLocationData = async (req, res) => {
   try {
-    const { geoMiddle, geoPeopleAddresses, geoBoundsAddresses } =
+    const { midLocation, geoPeopleAddresses, geoBoundsAddresses } =
       await getMiddlePoint(req.body);
     req.coordinates = geoPeopleAddresses;
     res.on("finish", () => {
       storeCoordinates(geoPeopleAddresses);
     });
     res.json({
-      middlePoint: geoMiddle,
+      middlePoint: midLocation,
       peopleAddresses: geoPeopleAddresses,
       boundsAddresses: geoBoundsAddresses,
     });

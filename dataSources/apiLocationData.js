@@ -1,6 +1,5 @@
 const axios = require("axios");
 const { getCenterOfBounds, getBounds } = require("geolib");
-const { Gone } = require("http-errors");
 const Address = require("../models/Address");
 
 require("dotenv").config();
@@ -11,6 +10,23 @@ const openSourceAPIKEY = process.env.OPEN_SOURCE_API_KEY;
 function delay(time = 20) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
+const getClosestCity = async (geoLocation) => {
+  const parameters = {
+    apikey: keyAPI,
+    pos: `${geoLocation.latitude},${geoLocation.longitude},0`,
+    prox: `${Geolocation.latitude},${Geolocation.longitude},1000`,
+    mode: "retrieveAreas",
+  };
+  const middleAddress = await axios.get(
+    "https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json",
+    { params: parameters }
+  );
+  console.log("this is the info from log", middleAddress.data);
+  const city =
+    middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
+  return city;
+  
+};
 
 const getCoordinates = async (peopleAddresses) => {
   const geoPeopleAddresses = [];
@@ -60,7 +76,7 @@ const getCoordinates = async (peopleAddresses) => {
   // }
 };
 exports.getMiddlePoint = async (peopleAddresses) => {
-  console.log({ peopleAddresses });
+  // console.log({ peopleAddresses });
   const geoPeopleAddressesFullArray = await getCoordinates(peopleAddresses);
   const geoPeopleAddresses = geoPeopleAddressesFullArray.map((element) => {
     return {
@@ -68,9 +84,18 @@ exports.getMiddlePoint = async (peopleAddresses) => {
       longitude: Number(element.longitude),
     };
   });
-  console.log(geoPeopleAddresses);
+  // console.log(geoPeopleAddresses);
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
+  console.log(geoMiddle);
+  const address = await getClosestCity(geoMiddle);
+  console.log(address);
+  const midLocation = {
+    latitude: geoMiddle.latitude,
+    longitude: geoMiddle.longitude,
+    address: address,
+  };
+
   // geolib function to find min and max of the bounds of coordinates
   const geoBoundsAddresses = getBounds(geoPeopleAddresses);
 
@@ -85,7 +110,7 @@ exports.getMiddlePoint = async (peopleAddresses) => {
   //   return sharingData;
 
   //   console.log("geoPeopleAddresses", geoPeopleAddresses);
-  return { geoMiddle, geoPeopleAddresses, geoBoundsAddresses };
+  return { midLocation, geoPeopleAddresses, geoBoundsAddresses };
 };
 
 // exports.getClosestCity = async (geoMiddle) => {
