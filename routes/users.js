@@ -19,8 +19,5 @@ router
   .delete(authenticate, deleteUser)
   .put(authenticate, updateUser);
 router.route("/login").post(loginUser);
-router
-  .route("/uploadMemory")
-  .post(authenticate, multer().single("file"), uploadMemory);
 
 module.exports = router;
