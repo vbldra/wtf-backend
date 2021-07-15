@@ -47,9 +47,9 @@ exports.addUser = async (req, res, next) => {
     // define email
     const msg = {
       to: email,
-      from: "flonelo77@gmail.com", // Use the email address or domain you verified above
+      from: "bocu.alexandru@gmail.com", // Use the email address or domain you verified above
       subject: "Greetings from Wir treffen Freunde",
-      text: `Please click this link to verify your email address: ${process.env.SERVER_URL}/users/verify/${emailToken}`,
+      text: `Please click this link to verify your email address: ${process.env.SERVER_URL}users/verify/${emailToken}`,
     };
 
     // send email
@@ -67,6 +67,11 @@ exports.verifyEmail = async (req, res) => {
   try {
     // find user that has this token
     const user = await User.findOne({ emailToken: emailToken });
+    if (!user) {
+      return res.status(401).json({
+        error: new Error('User not found!')
+      });
+    }
     user.emailVerified = true;
     await user.save();
     res.send("Your email address has been verified.");
@@ -77,11 +82,13 @@ exports.verifyEmail = async (req, res) => {
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email }).then(
     (user) => {
+      // 1. user exists?
       if (!user) {
         return res.status(401).json({
           error: new Error('User not found!')
         });
       }
+      // 2. password correct?
       bcrypt.compare(req.body.password, user.password).then(
         (valid) => {
           if (!valid) {
@@ -89,6 +96,8 @@ exports.login = (req, res, next) => {
               error: new Error('Incorrect password!')
             });
           }
+          // 3. email is verified?
+
           res.status(200).json({
             userId: user._id,
             token: 'token'

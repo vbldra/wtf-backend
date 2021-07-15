@@ -1,5 +1,7 @@
 var express = require("express");
 var router = express.Router();
+const {generateValidator } = require("../middlewares/validator")
+const {userValidationRules} = require("../lib/validation/userRules")
 const { authenticate } = require("../middlewares/authentication");
 const {
   addUser,
