@@ -11,7 +11,6 @@ exports.addUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-
     const user = new User(req.body);
     // const token = crypto.randomBytes(30).toString("hex");
     user.password = await bcrypt.hash(user.password, 10);
@@ -23,6 +22,7 @@ exports.addUser = async (req, res, next) => {
     next(e);
   }
 };
+
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
