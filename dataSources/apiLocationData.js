@@ -10,23 +10,7 @@ const openSourceAPIKEY = process.env.OPEN_SOURCE_API_KEY;
 function delay(time = 20) {
   return new Promise((resolve) => setTimeout(resolve, time));
 }
-const getClosestCity = async (geoLocation) => {
-  const parameters = {
-    apikey: keyAPI,
-    pos: `${geoLocation.latitude},${geoLocation.longitude},0`,
-    prox: `${Geolocation.latitude},${Geolocation.longitude},1000`,
-    mode: "retrieveAreas",
-  };
-  const middleAddress = await axios.get(
-    "https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json",
-    { params: parameters }
-  );
-  console.log("this is the info from log", middleAddress.data);
-  const city =
-    middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
-  return city;
-  
-};
+
 
 const getCoordinates = async (peopleAddresses) => {
   const geoPeopleAddresses = [];

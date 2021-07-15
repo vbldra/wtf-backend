@@ -8,6 +8,7 @@
     "test": "jest --verbose"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.4.5",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "~1.4.4",

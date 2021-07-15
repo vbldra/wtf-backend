@@ -8,16 +8,22 @@ const {
   updateUser,
   loginUser,
   uploadMemory,
+  forgotPassword,
+  verifyEmail,
 } = require("../controllers/userControllers");
 
 //user routes
 router
   .route("/")
+  
   .get(authenticate, getUser)
   .post(addUser)
   .delete(authenticate, deleteUser)
   .put(authenticate, updateUser);
+  
 router.route("/login").post(loginUser);
-router.route("/uploadMemory").post(authenticate, uploadMemory);
 
+router.route("/uploadMemory").post(authenticate, uploadMemory);
+router.route("/forgotPassword").post(forgotPassword)
+router.get("/verify/:emailToken", verifyEmail);
 module.exports = router;

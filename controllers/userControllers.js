@@ -4,7 +4,28 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
+const sgMail = require("@sendgrid/mail");
+require('dotenv').config()
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// exports.addUser = async (req, res, next) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(422).json({ errors: errors.array() });
+//     }
+
+//     const user = new User(req.body);
+//     // const token = crypto.randomBytes(30).toString("hex");
+//     user.password = await bcrypt.hash(user.password, 10);
+//     // user.token = token;
+//     await user.save();
+//     res.status(200).send(user);
+//   } catch (e) {
+//     next(e);
+//   }
+// };
+// adding a new user
 exports.addUser = async (req, res, next) => {
   try {
     const errors = validationResult(req);
@@ -13,14 +34,44 @@ exports.addUser = async (req, res, next) => {
     }
 
     const user = new User(req.body);
-    // const token = crypto.randomBytes(30).toString("hex");
+    //encrypt password
     user.password = await bcrypt.hash(user.password, 10);
-    // user.token = token;
+    // generate token
+    const emailToken = crypto.randomBytes(20).toString("hex");
+
+    // store token
+    user.emailToken = emailToken;
+    const email = user.email;
+
     await user.save();
-    delete user.password; // Maxim opinion,florian asked for help
+    // define email
+    const msg = {
+      to: email,
+      from: "flonelo77@gmail.com", // Use the email address or domain you verified above
+      subject: "Greetings from Wir treffen Freunde",
+      text: `Please click this link to verify your email address: ${process.env.SERVER_URL}/users/verify/${emailToken}`,
+    };
+
+    // send email
+    await sgMail.send(msg);
     res.status(200).send(user);
   } catch (e) {
     next(e);
+  }
+};
+//controller to verify email
+exports.verifyEmail = async (req, res) => {
+  //here use the same variable that is used in the verify route
+  const { emailToken } = req.params;
+  console.log("verify email");
+  try {
+    // find user that has this token
+    const user = await User.findOne({ emailToken: emailToken });
+    user.emailVerified = true;
+    await user.save();
+    res.send("Your email address has been verified.");
+  } catch (err) {
+    console.error(err);
   }
 };
 exports.login = (req, res, next) => {
@@ -59,6 +110,15 @@ exports.login = (req, res, next) => {
       });
     }
   );
+}
+exports.forgotPassword = async (res,req, next) =>  {
+  const user = await User.findOne({email:req.body.email})
+  if (!user) {
+    return res.status(401).json({
+      error: new Error('User not found!')
+    });
+  }
+
 }
 
 
