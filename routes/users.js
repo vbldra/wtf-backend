@@ -7,7 +7,6 @@ const {
   deleteUser,
   updateUser,
   loginUser,
-  uploadMemory,
 } = require("../controllers/userControllers");
 const multer = require("multer");
 
