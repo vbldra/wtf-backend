@@ -4,7 +4,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -131,12 +131,21 @@ exports.loginUser = async (req, res, next) => {
 };
 
 exports.uploadMemory = async (req, res, next) => {
+  function uploadToCloudinary(image) {
+    return new Promise((resolve, reject) => {
+      cloudinary.uploader.upload(image, (err, url) => {
+        console.log("cloudinary", err, url);
+        if (err) return reject(err);
+        return resolve(url);
+      });
+    });
+  }
+
   try {
-    console.log(req.body);
     console.log(req.file);
     console.log(req.body.title);
-
-    // cloudinary.upload(file, {}, callback);
+    const clres = uploadToCloudinary(req.file);
+    console.log(clres);
 
     //     {
     //   public_id: 'cr4mxeqx5zb8rlakpfkg',
