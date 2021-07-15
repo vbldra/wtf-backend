@@ -14,10 +14,15 @@ exports.getLocationData = async (req, res) => {
     res.on("finish", () => {
       storeCoordinates(geoPeopleAddresses);
     });
+    const hotelsData = await getHotels(midLocation);
+    const restaurantsData = await getRestaurants(midLocation);
+
     res.json({
       middlePoint: midLocation,
       peopleAddresses: geoPeopleAddresses,
       boundsAddresses: geoBoundsAddresses,
+      hotelsAddresses: hotelsData,
+      restaurantsAddresses: restaurantsData
     });
   } catch (err) {
     res.status(500);
