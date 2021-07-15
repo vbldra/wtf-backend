@@ -4,6 +4,13 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const cloudinary = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 exports.addUser = async (req, res, next) => {
   try {
@@ -24,58 +31,38 @@ exports.addUser = async (req, res, next) => {
   }
 };
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email }).then(
-    (user) => {
+  User.findOne({ email: req.body.email })
+    .then((user) => {
       if (!user) {
         return res.status(401).json({
-          error: new Error('User not found!')
+          error: new Error("User not found!"),
         });
       }
-      bcrypt.compare(req.body.password, user.password).then(
-        (valid) => {
+      bcrypt
+        .compare(req.body.password, user.password)
+        .then((valid) => {
           if (!valid) {
             return res.status(401).json({
-              error: new Error('Incorrect password!')
+              error: new Error("Incorrect password!"),
             });
           }
           res.status(200).json({
             userId: user._id,
-            token: 'token'
+            token: "token",
           });
-        }
-      ).catch(
-        (error) => {
+        })
+        .catch((error) => {
           res.status(500).json({
-            error: error
-            
+            error: error,
           });
-        }
-      );
-    }
-  ).catch(
-    (error) => {
+        });
+    })
+    .catch((error) => {
       res.status(500).json({
-        error: error
+        error: error,
       });
-    }
-  );
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    });
+};
 
 exports.getUser = async (req, res, next) => {
   try {
@@ -120,21 +107,20 @@ exports.loginUser = async (req, res, next) => {
       email: req.body.email,
     }).select("+password");
     console.log(req.body);
-    
 
     if (!user) throw new createError.NotFound();
     const isCorrectPassword = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    
+
     if (isCorrectPassword) {
       // const token = crypto.randomBytes(30).toString("hex");
       const token = jwt.sign(
         { user: user._id },
         process.env.ACCESS_TOKEN_SECRET
       );
-      
+
       res.json({ accessToken: token });
     } else {
       throw new createError.Unauthorized();
@@ -146,6 +132,27 @@ exports.loginUser = async (req, res, next) => {
 
 exports.uploadMemory = async (req, res, next) => {
   try {
+    console.log(req.body);
+    console.log(req.file);
+    console.log(req.body.title);
+
+    // cloudinary.upload(file, {}, callback);
+
+    //     {
+    //   public_id: 'cr4mxeqx5zb8rlakpfkg',
+    //   version: 1571218330,
+    //   signature: '63bfbca643baa9c86b7d2921d776628ac83a1b6e',
+    //   width: 864,
+    //   height: 576,
+    //   format: 'jpg',
+    //   resource_type: 'image',
+    //   created_at: '2017-06-26T19:46:03Z',
+    //   bytes: 120253,
+    //   type: 'upload',
+    //   url: 'http://res.cloudinary.com/demo/image/upload/v1571218330/cr4mxeqx5zb8rlakpfkg.jpg',
+    //   secure_url: 'https://res.cloudinary.com/demo/image/upload/v1571218330/cr4mxeqx5zb8rlakpfkg.jpg'
+    // }
+
     res.sendStatus(200);
   } catch (e) {
     next(e);

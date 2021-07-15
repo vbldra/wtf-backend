@@ -9,6 +9,7 @@ const {
   loginUser,
   uploadMemory,
 } = require("../controllers/userControllers");
+const multer = require("multer");
 
 //user routes
 router
@@ -18,6 +19,8 @@ router
   .delete(authenticate, deleteUser)
   .put(authenticate, updateUser);
 router.route("/login").post(loginUser);
-router.route("/uploadMemory").post(authenticate, uploadMemory);
+router
+  .route("/uploadMemory")
+  .post(authenticate, multer().single("file"), uploadMemory);
 
 module.exports = router;
