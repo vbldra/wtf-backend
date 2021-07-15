@@ -8,7 +8,6 @@ const {
   updateUser,
   loginUser,
 } = require("../controllers/userControllers");
-const multer = require("multer");
 
 //user routes
 router
