@@ -8,23 +8,13 @@ const sgMail = require("@sendgrid/mail");
 require('dotenv').config()
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-// exports.addUser = async (req, res, next) => {
-//   try {
-//     const errors = validationResult(req);
-//     if (!errors.isEmpty()) {
-//       return res.status(422).json({ errors: errors.array() });
-//     }
 
-//     const user = new User(req.body);
-//     // const token = crypto.randomBytes(30).toString("hex");
-//     user.password = await bcrypt.hash(user.password, 10);
-//     // user.token = token;
-//     await user.save();
-//     res.status(200).send(user);
-//   } catch (e) {
-//     next(e);
-//   }
-// };
+
+
+
+
+
+
 // adding a new user
 exports.addUser = async (req, res, next) => {
   try {
@@ -79,6 +69,42 @@ exports.verifyEmail = async (req, res) => {
     console.error(err);
   }
 };
+
+exports.forgotPassword = async (req, res, next) => {
+  const {email} = req.params;
+  console.log("resetPassword");
+  try {
+    // generate token
+    const resetPasswordToken = crypto.randomBytes(20).toString("hex");
+    const user = await User.findOne({ email: email });
+    // store token
+    user.resetPasswordToken = resetPasswordToken;
+    const email = user.email;
+
+    if (!user) {
+
+      return res.status(401).json({
+        error: new Error('User not found!')
+      });
+    }
+    // define email
+    const msg = {
+      to: email,
+      from: "bocu.alexandru@gmail.com", // Use the email address or domain you verified above
+      subject: "Greetings from Wir treffen Freunde",
+      text: `Please click this link to verify your email address: ${process.env.SERVER_URL}users/resetPassword/${resetPasswordToken}`,
+    };
+
+    // send email
+    await sgMail.send(msg);
+    res.status(200).send(user);
+  } catch (error) {
+    console.error(err);
+    
+  }
+}
+
+
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email }).then(
     (user) => {
@@ -97,7 +123,11 @@ exports.login = (req, res, next) => {
             });
           }
           // 3. email is verified?
-
+          if(!User.emailVerified){
+            return res.status(401).json({
+              error: new Error('Please verify your Email before logging in!')
+            })
+          }
           res.status(200).json({
             userId: user._id,
             token: 'token'

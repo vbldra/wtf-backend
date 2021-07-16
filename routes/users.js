@@ -26,6 +26,7 @@ router
 router.route("/login").post(loginUser);
 
 router.route("/uploadMemory").post(authenticate, uploadMemory);
-router.route("/forgotPassword").post(forgotPassword)
+// router.route("/forgotPassword").post(forgotPassword)
 router.get("/verify/:emailToken", verifyEmail);
+router.get("/resetPassword/:resetPasswordToken", forgotPassword)
 module.exports = router;

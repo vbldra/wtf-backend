@@ -24,6 +24,10 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    resetPasswordToken: {
+      type: String,
+      
+    },
     password: {
       type: String,
       required: true,
