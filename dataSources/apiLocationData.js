@@ -65,8 +65,13 @@ const getClosestCity = async (geoLocation) => {
   );
   const city =
     middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
-
-  return city;
+  const cityCoordinates = await axios(
+    `https://geocode.search.hereapi.com/v1/geocode?q=${city}&apiKey=${keyAPI}`
+  );
+  let lat = cityCoordinates.data.items[0].position.lat;
+  let lng = cityCoordinates.data.items[0].position.lng;
+  let cityObject = { latitude: lat, longitude: lng, address: city };
+  return cityObject;
 };
 
 exports.getMiddlePoint = async (peopleAddresses) => {

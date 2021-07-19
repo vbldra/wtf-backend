@@ -2,6 +2,7 @@ const {
   getMiddlePoint,
   getHotels,
   getRestaurants,
+  getClosestCity,
 } = require("../dataSources/apiLocationData");
 
 const { getBounds } = require("geolib");
@@ -18,10 +19,11 @@ exports.getLocationData = async (req, res) => {
     });
     const hotelsData = await getHotels(midLocation);
     const restaurantsData = await getRestaurants(midLocation);
+    const closestCityData = await getClosestCityInfo(midLocation);
 
-    const filteredData = [...hotelsData, ... restaurantsData];
+    const filteredData = [...hotelsData, ...restaurantsData, ...closestCityData];
     const filteredBoundedData = getBounds(filteredData);
-    
+
     res.json({
       middlePoint: midLocation,
       peopleAddresses: geoPeopleAddresses,
@@ -29,20 +31,21 @@ exports.getLocationData = async (req, res) => {
       hotelsAddresses: hotelsData,
       restaurantsAddresses: restaurantsData,
       boundsFiletered: filteredBoundedData,
+      /* closestCity: closestCityData, */
     });
   } catch (err) {
     res.status(500);
   }
 };
 
-// exports.getClosestCity = async (req, res) => {
-//   try {
-//     const locationData = await getClosestCity(req.body);
-//     res.json(locationData);
-//   } catch (err) {
-//     res.status(500);
-//   }
-// };
+exports.getClosestCityInfo = async (req, res) => {
+  try {
+    const locationData = await getClosestCity(req.body);
+    res.json(locationData);
+  } catch (err) {
+    res.status(500);
+  }
+};
 
 exports.getHotelsInformation = async (req, res) => {
   try {
