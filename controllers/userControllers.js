@@ -123,7 +123,7 @@ exports.login = (req, res, next) => {
             });
           }
           // 3. email is verified?
-          if(!User.emailVerified){
+          if(!user.emailVerified){
             return res.status(401).json({
               error: new Error('Please verify your Email before logging in!')
             })
