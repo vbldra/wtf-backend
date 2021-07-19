@@ -16,7 +16,7 @@ const getCoordinates = async (peopleAddresses) => {
 
   try {
     for (const address of peopleAddresses) {
-      await delay();
+      console.log(address);
       const dbLocation = await Address.findOne({
         location: address,
       });
@@ -26,22 +26,31 @@ const getCoordinates = async (peopleAddresses) => {
           address: address,
         });
       } else {
-        console.log("request coords from api");
+        console.log("request coords from api", address);
         // converting all the input fields to co-ordinates
-        const geoPosition = await axios(
+        try {
+          const geoPosition = await axios(
           `https://geocode.search.hereapi.com/v1/geocode?q=${address}&apiKey=${keyAPI}`
         );
+        console.log("Lets get geo postitions: ", geoPosition.data); 
+
         let lat = geoPosition.data.items[0].position.lat;
         let lng = geoPosition.data.items[0].position.lng;
-
+        try {
+          await Address.create({ location: address, longitude: lng, latitude: lat });
+        } catch(error) {
+          console.log(error);
+        };
         geoPeopleAddresses.push({
           latitude: lat,
           longitude: lng,
           address: address,
-        });
+        });} catch (error) {
+          // console.log(error);
+        }
       }
     }
-    console.log(geoPeopleAddresses);
+    console.log("INFO THAT WE NEED: ", geoPeopleAddresses);
     return geoPeopleAddresses;
   } catch (error) {
     throw new Error(error);
@@ -55,19 +64,25 @@ const getClosestCity = async (geoLocation) => {
     mode: "retrieveAreas",
     prox: `${geoLocation.latitude},${geoLocation.longitude},1000`,
   };
+  console.log(parameters);
   const middleAddress = await axios.get(
     `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json`,
     { params: parameters }
   );
-  console.log(
+  /* console.log(
     "details",
     middleAddress.data.Response.View[0].Result[0].Location.Address.Label
-  );
+  ); */
   const city =
     middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
+  
+  const cityToSend = city.replace(/\s/g, "").split(",").join("+");
+  console.log("We are here!", city);
+  // console.log(cityToSend);
   const cityCoordinates = await axios(
-    `https://geocode.search.hereapi.com/v1/geocode?q=${city}&apiKey=${keyAPI}`
+    `https://geocode.search.hereapi.com/v1/geocode?q=${cityToSend}&apiKey=${keyAPI}`
   );
+  console.log(JSON.stringify(cityCoordinates.data, null, 2));
   let lat = cityCoordinates.data.items[0].position.lat;
   let lng = cityCoordinates.data.items[0].position.lng;
   let cityObject = { latitude: lat, longitude: lng, address: city };
@@ -84,7 +99,7 @@ exports.getMiddlePoint = async (peopleAddresses) => {
       address: element.address,
     };
   });
-  console.log(geoPeopleAddresses);
+
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
   const address = await getClosestCity(geoMiddle);
@@ -93,11 +108,15 @@ exports.getMiddlePoint = async (peopleAddresses) => {
     longitude: geoMiddle.longitude,
     address: address,
   };
-  console.log("midLocation", midLocation);
+  // console.log("midLocation", midLocation);
   // geolib function to find min and max of the bounds of coordinates
   const geoBoundsAddresses = getBounds(geoPeopleAddresses);
-
-  return { midLocation, geoPeopleAddresses, geoBoundsAddresses };
+  console.log("Does the code reach here?")
+  return {
+    midLocation, 
+    geoPeopleAddresses, 
+    geoBoundsAddresses, 
+  };
 };
 
 exports.getHotels = async (geoLocation) => {
@@ -120,7 +139,7 @@ exports.getHotels = async (geoLocation) => {
     };
     hotelsList.push(hotel);
   }
-  console.log("hotels", hotelsList);
+  /* console.log("hotels", hotelsList); */
   const hotelsData = hotelsList;
   return hotelsData;
 };
@@ -144,7 +163,9 @@ exports.getRestaurants = async (geoLocation) => {
     };
     restaurantsList.push(restaurant);
   }
-  console.log("restaurants", restaurantsList);
+  /* console.log("restaurants", restaurantsList); */
   const restaurantsData = restaurantsList;
   return restaurantsData;
 };
+
+exports.getClosestCity = getClosestCity;
