@@ -4,6 +4,8 @@ const {
   getRestaurants,
 } = require("../dataSources/apiLocationData");
 
+const { getBounds } = require("geolib");
+
 const { storeCoordinates } = require("../dataSources/database");
 
 exports.getLocationData = async (req, res) => {
@@ -17,12 +19,16 @@ exports.getLocationData = async (req, res) => {
     const hotelsData = await getHotels(midLocation);
     const restaurantsData = await getRestaurants(midLocation);
 
+    const filteredData = [...hotelsData, ... restaurantsData];
+    const filteredBoundedData = getBounds(filteredData);
+    
     res.json({
       middlePoint: midLocation,
       peopleAddresses: geoPeopleAddresses,
       boundsAddresses: geoBoundsAddresses,
       hotelsAddresses: hotelsData,
-      restaurantsAddresses: restaurantsData
+      restaurantsAddresses: restaurantsData,
+      boundsFiletered: filteredBoundedData,
     });
   } catch (err) {
     res.status(500);
