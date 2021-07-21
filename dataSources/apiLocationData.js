@@ -1,22 +1,16 @@
 const axios = require("axios");
 const { getCenterOfBounds, getBounds } = require("geolib");
 const Address = require("../models/Address");
-
 require("dotenv").config();
-
 const keyAPI = process.env.API_KEY;
 const openSourceAPIKEY = process.env.OPEN_SOURCE_API_KEY;
-
 function delay(time = 20) {
   return new Promise((resolve) => setTimeout(resolve, time));
-}
-
+};
 const getCoordinates = async (peopleAddresses) => {
   const geoPeopleAddresses = [];
-
   try {
     for (const address of peopleAddresses) {
-      console.log(address);
       const dbLocation = await Address.findOne({
         location: address,
       });
@@ -26,37 +20,42 @@ const getCoordinates = async (peopleAddresses) => {
           address: address,
         });
       } else {
-        console.log("request coords from api", address);
         // converting all the input fields to co-ordinates
         try {
+          const parameters = {
+            apiKey: keyAPI,
+            q: address,
+          };
           const geoPosition = await axios(
-          `https://geocode.search.hereapi.com/v1/geocode?q=${address}&apiKey=${keyAPI}`
-        );
-        console.log("Lets get geo postitions: ", geoPosition.data); 
-
-        let lat = geoPosition.data.items[0].position.lat;
-        let lng = geoPosition.data.items[0].position.lng;
-        try {
-          await Address.create({ location: address, longitude: lng, latitude: lat });
-        } catch(error) {
+            `https://geocode.search.hereapi.com/v1/geocode`,
+            { params: parameters }
+          );
+          let lat = geoPosition.data.items[0].position.lat;
+          let lng = geoPosition.data.items[0].position.lng;
+          try {
+            await Address.create({
+              location: address,
+              longitude: lng,
+              latitude: lat,
+            });
+          } catch (error) {
+            console.log(error);
+          }
+          geoPeopleAddresses.push({
+            latitude: lat,
+            longitude: lng,
+            address: address,
+          });
+        } catch (error) {
           console.log(error);
-        };
-        geoPeopleAddresses.push({
-          latitude: lat,
-          longitude: lng,
-          address: address,
-        });} catch (error) {
-          // console.log(error);
         }
       }
     }
-    console.log("INFO THAT WE NEED: ", geoPeopleAddresses);
     return geoPeopleAddresses;
   } catch (error) {
-    throw new Error(error);
+    console.error(error);
   }
 };
-
 const getClosestCity = async (geoLocation) => {
   const parameters = {
     apiKey: keyAPI,
@@ -64,33 +63,33 @@ const getClosestCity = async (geoLocation) => {
     mode: "retrieveAreas",
     prox: `${geoLocation.latitude},${geoLocation.longitude},1000`,
   };
-  console.log(parameters);
   const middleAddress = await axios.get(
     `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json`,
     { params: parameters }
   );
-  /* console.log(
-    "details",
-    middleAddress.data.Response.View[0].Result[0].Location.Address.Label
-  ); */
-  const city =
-    middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
-  
-  const cityToSend = city.replace(/\s/g, "").split(",").join("+");
-  console.log("We are here!", city);
-  // console.log(cityToSend);
-  const cityCoordinates = await axios(
-    `https://geocode.search.hereapi.com/v1/geocode?q=${cityToSend}&apiKey=${keyAPI}`
-  );
-  console.log(JSON.stringify(cityCoordinates.data, null, 2));
-  let lat = cityCoordinates.data.items[0].position.lat;
-  let lng = cityCoordinates.data.items[0].position.lng;
-  let cityObject = { latitude: lat, longitude: lng, address: city };
-  return cityObject;
+  if (middleAddress.data.Response.View.length) {
+    const city =
+      middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
+    const cityToSend = city.replace(/\s/g, "").split(",").join("+");
+    const parametersCity = {
+      q: cityToSend,
+      apiKey: keyAPI,
+    };
+    const cityCoordinates = await axios(
+      `https://geocode.search.hereapi.com/v1/geocode`,
+      { params: parametersCity }
+    );
+    let lat = cityCoordinates.data.items[0].position.lat;
+    let lng = cityCoordinates.data.items[0].position.lng;
+    let cityObject = { latitude: lat, longitude: lng, address: city };
+    return cityObject;
+  } else {
+    console.log("NO CITIES AROUND")
+    return {error: "no closest city"}
+  }
 };
-
 exports.getMiddlePoint = async (peopleAddresses) => {
-  console.log({ peopleAddresses });
+  // console.log({ peopleAddresses });
   const geoPeopleAddressesFullArray = await getCoordinates(peopleAddresses);
   const geoPeopleAddresses = geoPeopleAddressesFullArray.map((element) => {
     return {
@@ -99,7 +98,6 @@ exports.getMiddlePoint = async (peopleAddresses) => {
       address: element.address,
     };
   });
-
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
   const address = await getClosestCity(geoMiddle);
@@ -108,29 +106,25 @@ exports.getMiddlePoint = async (peopleAddresses) => {
     longitude: geoMiddle.longitude,
     address: address,
   };
-  // console.log("midLocation", midLocation);
   // geolib function to find min and max of the bounds of coordinates
   const geoBoundsAddresses = getBounds(geoPeopleAddresses);
-  console.log("Does the code reach here?")
   return {
-    midLocation, 
-    geoPeopleAddresses, 
-    geoBoundsAddresses, 
+    midLocation,
+    geoPeopleAddresses,
+    geoBoundsAddresses,
   };
 };
-
 exports.getHotels = async (geoLocation) => {
   let hotelsList = [];
   const parameters = {
     apiKey: keyAPI,
-    pos: `${geoLocation.latitude},${geoLocation.longitude},270`,
-    mode: "retrieveLandmarks",
-    prox: `${geoLocation.latitude},${geoLocation.longitude},100`,
+    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=5000`,
+    q: "hotels",
   };
   const hotels = await axios.get(
-    `https://discover.search.hereapi.com/v1/discover?in=circle:${geoLocation.latitude},${geoLocation.longitude};r=5000&q=hotels&apiKey=${keyAPI}`
+    `https://discover.search.hereapi.com/v1/discover`,
+    { params: parameters }
   );
-
   for (let index = 0; index < hotels.data.items.length; index++) {
     let hotel = {
       latitude: hotels.data.items[index].position.lat,
@@ -139,21 +133,18 @@ exports.getHotels = async (geoLocation) => {
     };
     hotelsList.push(hotel);
   }
-  /* console.log("hotels", hotelsList); */
   const hotelsData = hotelsList;
   return hotelsData;
 };
-
 exports.getRestaurants = async (geoLocation) => {
   let restaurantsList = [];
   const parameters = {
     apiKey: keyAPI,
-    pos: `${geoLocation.latitude},${geoLocation.longitude},270`,
-    mode: "retrieveLandmarks",
-    prox: `${geoLocation.latitude},${geoLocation.longitude},100`,
+    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=5000`,
+    q: `restaurants`
   };
   const restaurants = await axios.get(
-    `https://discover.search.hereapi.com/v1/discover?in=circle:${geoLocation.latitude},${geoLocation.longitude};r=5000&q=restaurants&apiKey=${keyAPI}`
+    `https://discover.search.hereapi.com/v1/discover`, { params: parameters }
   );
   for (let index = 0; index < restaurants.data.items.length; index++) {
     let restaurant = {
@@ -163,9 +154,7 @@ exports.getRestaurants = async (geoLocation) => {
     };
     restaurantsList.push(restaurant);
   }
-  /* console.log("restaurants", restaurantsList); */
   const restaurantsData = restaurantsList;
   return restaurantsData;
 };
-
 exports.getClosestCity = getClosestCity;
