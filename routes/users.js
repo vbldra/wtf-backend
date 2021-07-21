@@ -12,6 +12,7 @@ const {
   uploadMemory,
   forgotPassword,
   verifyEmail,
+  deleteMemory,
 } = require("../controllers/userControllers");
 
 //user routes
@@ -24,6 +25,7 @@ router
   .put(authenticate, updateUser);
   
 router.route("/login").post(loginUser);
+router.route("/memory").delete(deleteMemory);
 
 router.route("/uploadMemory").post(authenticate, uploadMemory);
 // router.route("/forgotPassword").post(forgotPassword)

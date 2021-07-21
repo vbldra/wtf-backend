@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
 require('dotenv').config()
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const cloudinary = require("cloudinary").v2;
 
 
 
@@ -22,7 +23,6 @@ exports.addUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-
     const user = new User(req.body);
     //encrypt password
     user.password = await bcrypt.hash(user.password, 10);
@@ -111,7 +111,7 @@ exports.login = (req, res, next) => {
       // 1. user exists?
       if (!user) {
         return res.status(401).json({
-          error: new Error('User not found!')
+          error: new Error("User not found!"),
         });
       }
       // 2. password correct?
@@ -119,7 +119,7 @@ exports.login = (req, res, next) => {
         (valid) => {
           if (!valid) {
             return res.status(401).json({
-              error: new Error('Incorrect password!')
+              error: new Error("Incorrect password!"),
             });
           }
           // 3. email is verified?
@@ -130,51 +130,21 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: 'token'
+            token: "token",
           });
-        }
-      ).catch(
-        (error) => {
+        })
+        .catch((error) => {
           res.status(500).json({
-            error: error
-            
+            error: error,
           });
-        }
-      );
-    }
-  ).catch(
-    (error) => {
+        });
+    })
+    .catch((error) => {
       res.status(500).json({
-        error: error
+        error: error,
       });
-    }
-  );
-}
-exports.forgotPassword = async (res,req, next) =>  {
-  const user = await User.findOne({email:req.body.email})
-  if (!user) {
-    return res.status(401).json({
-      error: new Error('User not found!')
     });
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+};
 
 exports.getUser = async (req, res, next) => {
   try {
@@ -219,21 +189,20 @@ exports.loginUser = async (req, res, next) => {
       email: req.body.email,
     }).select("+password");
     console.log(req.body);
-    
 
     if (!user) throw new createError.NotFound();
     const isCorrectPassword = await bcrypt.compare(
       req.body.password,
       user.password
     );
-    
+
     if (isCorrectPassword) {
       // const token = crypto.randomBytes(30).toString("hex");
       const token = jwt.sign(
         { user: user._id },
         process.env.ACCESS_TOKEN_SECRET
       );
-      
+
       res.json({ accessToken: token });
     } else {
       throw new createError.Unauthorized();
@@ -243,10 +212,19 @@ exports.loginUser = async (req, res, next) => {
   }
 };
 
-exports.uploadMemory = async (req, res, next) => {
+exports.deleteMemory = async (req, res, next) => {
+  console.log(req.body.public_id);
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
   try {
-    res.sendStatus(200);
-  } catch (e) {
-    next(e);
+    const clres = await cloudinary.uploader.destroy(
+      process.env.CLOUDINARY_FOLDER + "/" + req.body.public_id
+    );
+    res.json(clres);
+  } catch (error) {
+    next(error);
   }
 };
