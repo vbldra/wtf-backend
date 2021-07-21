@@ -56,18 +56,20 @@ const getCoordinates = async (peopleAddresses) => {
     console.error(error);
   }
 };
+
 const getClosestCity = async (geoLocation) => {
   const parameters = {
     apiKey: keyAPI,
     pos: `${geoLocation.latitude},${geoLocation.longitude},0`,
-    mode: "retrieveAreas",
-    prox: `${geoLocation.latitude},${geoLocation.longitude},1000`,
+    mode: "retrieveAll",
+    prox: `${geoLocation.latitude},${geoLocation.longitude},100000`,
   };
   const middleAddress = await axios.get(
     `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json`,
     { params: parameters }
   );
   if (middleAddress.data.Response.View.length) {
+    console.log(middleAddress.data.Response.View[0].Result[0].Location.Address)
     const city =
       middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
     const cityToSend = city.replace(/\s/g, "").split(",").join("+");
@@ -85,9 +87,10 @@ const getClosestCity = async (geoLocation) => {
     return cityObject;
   } else {
     console.log("NO CITIES AROUND")
-    return {error: "no closest city"}
+    return {error: "Your middle point is in unpopulated area"}
   }
 };
+
 exports.getMiddlePoint = async (peopleAddresses) => {
   // console.log({ peopleAddresses });
   const geoPeopleAddressesFullArray = await getCoordinates(peopleAddresses);

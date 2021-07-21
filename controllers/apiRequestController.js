@@ -17,9 +17,8 @@ exports.getLocationData = async (req, res) => {
     const hotelsData = await getHotels(midLocation);
     const restaurantsData = await getRestaurants(midLocation);
     const closestCityData = await getClosestCity(midLocation);
-    //   /* console.log(closestCityData); */
-    //   /* const filteredData = [...hotelsData, ...restaurantsData, ...closestCityData];
-    //   const filteredBoundedData = getBounds(filteredData); */
+    const filteredData = [...hotelsData, ...restaurantsData];
+    const filteredBoundedData = getBounds(filteredData);
     // console.log("CLOSEST CITY",closestCityData)
     res.json({
       middlePoint: midLocation,
@@ -27,11 +26,11 @@ exports.getLocationData = async (req, res) => {
       boundsAddresses: geoBoundsAddresses,
       hotelsAddresses: hotelsData,
       restaurantsAddresses: restaurantsData,
-      //     /* boundsFiletered: filteredBoundedData, */
+      boundsFiletered: filteredBoundedData,
       closestCity: closestCityData,
     });
   } catch (err) {
-    console.error(err) // !!!
+    console.error(err); // !!!
     res.status(500);
   }
 };
