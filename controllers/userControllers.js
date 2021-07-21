@@ -4,6 +4,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
+const cloudinary = require("cloudinary").v2;
 
 exports.addUser = async (req, res, next) => {
   try {
@@ -120,5 +121,22 @@ exports.loginUser = async (req, res, next) => {
     }
   } catch (e) {
     next(e);
+  }
+};
+
+exports.deleteMemory = async (req, res, next) => {
+  console.log(req.body.public_id);
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  try {
+    const clres = await cloudinary.uploader.destroy(
+      process.env.CLOUDINARY_FOLDER + "/" + req.body.public_id
+    );
+    res.json(clres);
+  } catch (error) {
+    next(error);
   }
 };
