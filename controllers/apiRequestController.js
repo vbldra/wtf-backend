@@ -19,9 +19,9 @@ exports.getLocationData = async (req, res) => {
     const hotelsData = await getHotels(midLocation);
     const restaurantsData = await getRestaurants(midLocation);
 
-    const filteredData = [...hotelsData, ... restaurantsData];
+    const filteredData = [...hotelsData, ...restaurantsData];
     const filteredBoundedData = getBounds(filteredData);
-    
+
     res.json({
       middlePoint: midLocation,
       peopleAddresses: geoPeopleAddresses,

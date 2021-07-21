@@ -7,7 +7,7 @@ const {
   deleteUser,
   updateUser,
   loginUser,
-  uploadMemory,
+  deleteMemory,
 } = require("../controllers/userControllers");
 
 //user routes
@@ -18,6 +18,6 @@ router
   .delete(authenticate, deleteUser)
   .put(authenticate, updateUser);
 router.route("/login").post(loginUser);
-router.route("/uploadMemory").post(authenticate, uploadMemory);
+router.route("/memory").delete(deleteMemory);
 
 module.exports = router;
