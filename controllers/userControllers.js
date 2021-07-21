@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const cloudinary = require("cloudinary").v2;
 
 // adding a new user
 exports.addUser = async (req, res, next) => {
@@ -15,7 +16,6 @@ exports.addUser = async (req, res, next) => {
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     }
-
     const user = new User(req.body);
     //encrypt password
     user.password = await bcrypt.hash(user.password, 10);
@@ -127,7 +127,6 @@ exports.forgotPassword = async (res, req, next) => {
     });
   }
 };
-
 exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.userId).select("-password");
@@ -163,7 +162,6 @@ exports.updateUser = async (req, res, next) => {
     next(e);
   }
 };
-
 // exports.loginUser = async (req, res, next) => {
 //   try {
 //     console.log("logging in...");
@@ -192,12 +190,50 @@ exports.updateUser = async (req, res, next) => {
 //   } catch (e) {
 //     next(e);
 //   }
-// };
-
-exports.uploadMemory = async (req, res, next) => {
+// }
+exports.loginUser = async (req, res, next) => {
   try {
-    res.sendStatus(200);
+    console.log("logging in...");
+    const user = await User.findOne({
+      email: req.body.email,
+    }).select("+password");
+    console.log(req.body);
+
+    if (!user) throw new createError.NotFound();
+    const isCorrectPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+
+    if (isCorrectPassword) {
+      // const token = crypto.randomBytes(30).toString("hex");
+      const token = jwt.sign(
+        { user: user._id },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+
+      res.json({ accessToken: token });
+    } else {
+      throw new createError.Unauthorized();
+    }
   } catch (e) {
     next(e);
+  }
+};
+
+exports.deleteMemory = async (req, res, next) => {
+  console.log(req.body.public_id);
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+  try {
+    const clres = await cloudinary.uploader.destroy(
+      process.env.CLOUDINARY_FOLDER + "/" + req.body.public_id
+    );
+    res.json(clres);
+  } catch (error) {
+    next(error);
   }
 };
