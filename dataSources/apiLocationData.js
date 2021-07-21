@@ -18,12 +18,12 @@ const getCoordinates = async (peopleAddresses) => {
     for (const address of peopleAddresses) {
       await delay();
       const dbLocation = await Address.findOne({
-        location: address,
+        location: address.toLowerCase(),
       });
       if (dbLocation) {
         geoPeopleAddresses.push({
           ...dbLocation.toObject(),
-          address: address,
+          address: address.toLowerCase(),
         });
       } else {
         console.log("request coords from api");
@@ -65,8 +65,13 @@ const getClosestCity = async (geoLocation) => {
   );
   const city =
     middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
-
-  return city;
+  const cityCoordinates = await axios(
+    `https://geocode.search.hereapi.com/v1/geocode?q=${city}&apiKey=${keyAPI}`
+  );
+  let lat = cityCoordinates.data.items[0].position.lat;
+  let lng = cityCoordinates.data.items[0].position.lng;
+  let cityObject = { lat: lat, lng: lng };
+  return { cityObject, city };
 };
 
 exports.getMiddlePoint = async (peopleAddresses) => {
