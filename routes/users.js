@@ -9,7 +9,6 @@ const {
   deleteUser,
   updateUser,
   loginUser,
-  uploadMemory,
   forgotPassword,
   verifyEmail,
   deleteMemory,
@@ -27,7 +26,7 @@ router
 router.route("/login").post(loginUser);
 router.route("/memory").delete(deleteMemory);
 
-router.route("/uploadMemory").post(authenticate, uploadMemory);
+// router.route("/uploadMemory").post(authenticate, uploadMemory);
 // router.route("/forgotPassword").post(forgotPassword)
 router.get("/verify/:emailToken", verifyEmail);
 router.get("/resetPassword/:resetPasswordToken", forgotPassword)

@@ -2,7 +2,7 @@ const User = require("../models/User");
 const createError = require("http-errors");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
 require('dotenv').config()
