@@ -1,3 +1,4 @@
+
 {
   "name": "wtf-backend",
   "version": "0.0.0",
@@ -8,6 +9,7 @@
     "test": "jest --verbose"
   },
   "dependencies": {
+    "@sendgrid/mail": "^7.4.5",
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.26.2",

@@ -4,24 +4,27 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
-
+require("dotenv").config();
 var cors = require("cors");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var apiRouter = require("./routes/api");
-var botRouter = require("./routes/bot")
+var botRouter = require("./routes/bot");
 var app = express();
-require("dotenv").config();
+
+/**
+ * ENV VARIABLES
+ */
+const dBUser = process.env.DB_USER;
+const dBPassword = process.env.DB_PASSWORD;
+const dBURL = process.env.DB_URL;
 
 // connect to the database
-mongoose.connect(
-  "mongodb+srv://wtfPeople:wirTreffenFreunde@cluster0.shexe.mongodb.net/wtf?retryWrites=true&w=majority",
-  {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(`mongodb+srv://${dBUser}:${dBPassword}@${dBURL}`, {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useUnifiedTopology: true,
+});
 
 mongoose.connection.on("error", console.error);
 mongoose.connection.on("open", function () {
@@ -42,7 +45,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/api", apiRouter);
-app.use("/bot", botRouter)
+app.use("/bot", botRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
