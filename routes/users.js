@@ -10,6 +10,9 @@ const {
   updateUser,
   loginUser,
   deleteMemory,
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/userControllers");
 
 //user routes
@@ -18,14 +21,12 @@ router
 
   .get(authenticate, getUser)
   .post(addUser)
-  .delete(authenticate, deleteUser)
-  .put(authenticate, updateUser);
+  .delete(authenticate, deleteUser);
+router.post("/forgotpassword", forgotPassword);
 
 router.route("/login").post(loginUser);
 router.route("/memory").delete(deleteMemory);
-
-router.route("/uploadMemory").post(authenticate, uploadMemory);
 // router.route("/forgotPassword").post(forgotPassword)
 router.get("/verify/:emailToken", verifyEmail);
-router.get("/resetPassword/:resetPasswordToken", forgotPassword);
+router.put("/resetPassword", resetPassword);
 module.exports = router;
