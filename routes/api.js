@@ -7,6 +7,6 @@ const {
 } = require("../controllers/apiRequestController");
 
 router.post("/", getLocationData);
-router.post("/hotels", getHotelsInformation);
-router.post("/restaurants", getRestaurantsInformation);
+// router.post("/hotels", getHotelsInformation);
+// router.post("/restaurants", getRestaurantsInformation);
 module.exports = router;

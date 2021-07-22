@@ -26,15 +26,13 @@ const UserSchema = new Schema(
     },
     resetPasswordToken: {
       type: String,
-      
     },
     password: {
       type: String,
       required: true,
     },
     token: {
-      type:String,
-      
+      type: String,
     },
     promotions: {
       type: Boolean,

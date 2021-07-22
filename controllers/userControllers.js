@@ -5,16 +5,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const sgMail = require("@sendgrid/mail");
-require('dotenv').config()
+require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 const cloudinary = require("cloudinary").v2;
-
-
-
-
-
-
-
 
 // adding a new user
 exports.addUser = async (req, res, next) => {
@@ -59,91 +52,104 @@ exports.verifyEmail = async (req, res) => {
     const user = await User.findOne({ emailToken: emailToken });
     if (!user) {
       return res.status(401).json({
-        error: new Error('User not found!')
+        error: new Error("User not found!"),
       });
     }
     user.emailVerified = true;
     await user.save();
-    res.send("Your email address has been verified.");
+    res.redirect(process.env.FRONTEND_URL + "/verified");
   } catch (err) {
     console.error(err);
   }
 };
 
 exports.forgotPassword = async (req, res, next) => {
-  const {email} = req.params;
   console.log("resetPassword");
+
   try {
+    const email = req.body.email;
     // generate token
     const resetPasswordToken = crypto.randomBytes(20).toString("hex");
     const user = await User.findOne({ email: email });
     // store token
     user.resetPasswordToken = resetPasswordToken;
-    const email = user.email;
 
     if (!user) {
-
       return res.status(401).json({
-        error: new Error('User not found!')
+        error: new Error("User not found!"),
       });
     }
+    await user.save();
     // define email
     const msg = {
       to: email,
-      from: "bocu.alexandru@gmail.com", // Use the email address or domain you verified above
-      subject: "Greetings from Wir treffen Freunde",
-      text: `Please click this link to verify your email address: ${process.env.SERVER_URL}users/resetPassword/${resetPasswordToken}`,
+      from: "mamuna.anwar@gmail.com", // Use the email address or domain you verified above
+      subject: "Reset your password for wir treffen freunde",
+      text: `Please click this link to verify your email address: ${process.env.FRONTEND_URL}/reset-password/${resetPasswordToken}`,
     };
 
     // send email
     await sgMail.send(msg);
     res.status(200).send(user);
   } catch (error) {
-    console.error(err);
-    
+    console.error(error);
   }
-}
+};
 
-
-exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email }).then(
-    (user) => {
-      // 1. user exists?
-      if (!user) {
-        return res.status(401).json({
-          error: new Error("User not found!"),
-        });
+//controller to update the password
+exports.resetPassword = async (req, res) => {
+  //here use the same variable that is used in the verify route
+  const { token } = req.body;
+  console.log("reset password");
+  try {
+    // find user that has this token
+    const user = await User.findOneAndUpdate(
+      { resetPasswordToken: token },
+      {
+        new: true,
+        runValidators: true,
       }
-      // 2. password correct?
-      bcrypt.compare(req.body.password, user.password).then(
-        (valid) => {
-          if (!valid) {
-            return res.status(401).json({
-              error: new Error("Incorrect password!"),
-            });
-          }
-          // 3. email is verified?
-          if(!user.emailVerified){
-            return res.status(401).json({
-              error: new Error('Please verify your Email before logging in!')
-            })
-          }
-          res.status(200).json({
-            userId: user._id,
-            token: "token",
-          });
-        })
-        .catch((error) => {
-          res.status(500).json({
-            error: error,
-          });
-        });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        error: error,
+    );
+    if (!user) {
+      return res.status(401).json({
+        error: new Error("User not found!"),
       });
-    });
+    }
+
+    //res.send("Your email address has been verified.");
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+exports.loginUser = async (req, res, next) => {
+  const userCredentials = req.body;
+  const inputPassword = userCredentials.password;
+  // get user from database
+  const foundUser = await User.findOne({ email: userCredentials.email }).select(
+    "+password"
+  );
+
+  if (!foundUser) {
+    res.json({ error: "User not found" });
+  } else {
+    const password = foundUser.password;
+    const isCorrectPassword = await bcrypt.compare(inputPassword, password);
+    if (!isCorrectPassword) {
+      res.json({ error: "Wrong password" });
+    } else if (!foundUser.emailVerified) {
+      res.json({ error: "email not verified yet" });
+    } else {
+      const token = jwt.sign(
+        { user: foundUser._id },
+        process.env.ACCESS_TOKEN_SECRET
+      );
+
+      res.json({ accessToken: token });
+    }
+  }
+
+  next();
 };
 
 exports.getUser = async (req, res, next) => {
@@ -182,35 +188,35 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-exports.loginUser = async (req, res, next) => {
-  try {
-    console.log("logging in...");
-    const user = await User.findOne({
-      email: req.body.email,
-    }).select("+password");
-    console.log(req.body);
+// exports.loginUser = async (req, res, next) => {
+//   try {
+//     console.log("logging in...");
+//     const user = await User.findOne({
+//       email: req.body.email,
+//     }).select("+password");
+//     console.log(req.body);
 
-    if (!user) throw new createError.NotFound();
-    const isCorrectPassword = await bcrypt.compare(
-      req.body.password,
-      user.password
-    );
+//     if (!user) throw new createError.NotFound();
+//     const isCorrectPassword = await bcrypt.compare(
+//       req.body.password,
+//       user.password
+//     );
 
-    if (isCorrectPassword) {
-      // const token = crypto.randomBytes(30).toString("hex");
-      const token = jwt.sign(
-        { user: user._id },
-        process.env.ACCESS_TOKEN_SECRET
-      );
+//     if (isCorrectPassword) {
+//       // const token = crypto.randomBytes(30).toString("hex");
+//       const token = jwt.sign(
+//         { user: user._id },
+//         process.env.ACCESS_TOKEN_SECRET
+//       );
 
-      res.json({ accessToken: token });
-    } else {
-      throw new createError.Unauthorized();
-    }
-  } catch (e) {
-    next(e);
-  }
-};
+//       res.json({ accessToken: token });
+//     } else {
+//       throw new createError.Unauthorized();
+//     }
+//   } catch (e) {
+//     next(e);
+//   }
+// };
 
 exports.deleteMemory = async (req, res, next) => {
   console.log(req.body.public_id);
