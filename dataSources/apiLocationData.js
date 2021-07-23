@@ -98,6 +98,7 @@ exports.getMiddlePoint = async (peopleAddresses) => {
       address: element.address,
     };
   });
+  // console.log(geoPeopleAddresses);
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
   const address = await getClosestCity(geoMiddle);

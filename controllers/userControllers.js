@@ -30,7 +30,7 @@ exports.addUser = async (req, res, next) => {
     // define email
     const msg = {
       to: email,
-      from: "mamuna.anwar@gmail.com", // Use the email address or domain you verified above
+      from: "bocu.alexandru@gmail.com", // Use the email address or domain you verified above
       subject: "Greetings from Wir treffen Freunde",
       text: `Please click this link to verify your email address: ${process.env.SERVER_URL}users/verify/${emailToken}`,
     };
