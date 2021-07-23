@@ -6,18 +6,18 @@ const keyAPI = process.env.API_KEY;
 const openSourceAPIKEY = process.env.OPEN_SOURCE_API_KEY;
 function delay(time = 20) {
   return new Promise((resolve) => setTimeout(resolve, time));
-};
+}
 const getCoordinates = async (peopleAddresses) => {
   const geoPeopleAddresses = [];
   try {
     for (const address of peopleAddresses) {
       const dbLocation = await Address.findOne({
-        location: address,
+        location: address.toLowerCase(),
       });
       if (dbLocation) {
         geoPeopleAddresses.push({
           ...dbLocation.toObject(),
-          address: address,
+          address: address.toLowerCase(),
         });
       } else {
         // converting all the input fields to co-ordinates
@@ -102,6 +102,7 @@ exports.getMiddlePoint = async (peopleAddresses) => {
       address: element.address,
     };
   });
+  // console.log(geoPeopleAddresses);
   // geolib function to find center of all the points
   const geoMiddle = getCenterOfBounds(geoPeopleAddresses);
   const address = await getClosestCity(geoMiddle);
@@ -148,7 +149,8 @@ exports.getRestaurants = async (geoLocation) => {
     q: `restaurants`
   };
   const restaurants = await axios.get(
-    `https://discover.search.hereapi.com/v1/discover`, { params: parameters }
+    `https://discover.search.hereapi.com/v1/discover`,
+    { params: parameters }
   );
   for (let index = 0; index < restaurants.data.items.length; index++) {
     let restaurant = {
