@@ -56,18 +56,20 @@ const getCoordinates = async (peopleAddresses) => {
     console.error(error);
   }
 };
+
 const getClosestCity = async (geoLocation) => {
   const parameters = {
     apiKey: keyAPI,
     pos: `${geoLocation.latitude},${geoLocation.longitude},0`,
-    mode: "retrieveAreas",
-    prox: `${geoLocation.latitude},${geoLocation.longitude},1000`,
+    mode: "retrieveAll",
+    prox: `${geoLocation.latitude},${geoLocation.longitude},100000`,
   };
   const middleAddress = await axios.get(
     `https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json`,
     { params: parameters }
   );
   if (middleAddress.data.Response.View.length) {
+    // console.log(middleAddress.data.Response.View[0].Result[0].Location.Address)
     const city =
       middleAddress.data.Response.View[0].Result[0].Location.Address.Label;
     const cityToSend = city.replace(/\s/g, "").split(",").join("+");
@@ -82,12 +84,14 @@ const getClosestCity = async (geoLocation) => {
     let lat = cityCoordinates.data.items[0].position.lat;
     let lng = cityCoordinates.data.items[0].position.lng;
     let cityObject = { latitude: lat, longitude: lng, address: city };
+    // console.log("this", cityObject)
     return cityObject;
   } else {
-    console.log("NO CITIES AROUND");
-    return { error: "no closest city" };
+    console.log("NO CITIES AROUND")
+    return {error: "Your middle point is in unpopulated area"}
   }
 };
+
 exports.getMiddlePoint = async (peopleAddresses) => {
   // console.log({ peopleAddresses });
   const geoPeopleAddressesFullArray = await getCoordinates(peopleAddresses);
@@ -119,7 +123,7 @@ exports.getHotels = async (geoLocation) => {
   let hotelsList = [];
   const parameters = {
     apiKey: keyAPI,
-    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=5000`,
+    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=100000`,
     q: "hotels",
   };
   const hotels = await axios.get(
@@ -141,8 +145,8 @@ exports.getRestaurants = async (geoLocation) => {
   let restaurantsList = [];
   const parameters = {
     apiKey: keyAPI,
-    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=5000`,
-    q: `restaurants`,
+    in: `circle:${geoLocation.latitude},${geoLocation.longitude};r=100000`,
+    q: `restaurants`
   };
   const restaurants = await axios.get(
     `https://discover.search.hereapi.com/v1/discover`,
