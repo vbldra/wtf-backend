@@ -9,8 +9,6 @@ const {
   deleteUser,
   updateUser,
   loginUser,
-  forgotPassword,
-  verifyEmail,
   deleteMemory,
   verifyEmail,
   forgotPassword,
