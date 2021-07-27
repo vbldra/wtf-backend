@@ -181,6 +181,7 @@ exports.updateUser = async (req, res, next) => {
       new: true,
       runValidators: true,
     });
+    console.log(req.userId);
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
   } catch (e) {

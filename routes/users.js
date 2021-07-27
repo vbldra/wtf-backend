@@ -18,7 +18,7 @@ const {
 //user routes
 router
   .route("/")
-
+  .put(authenticate, updateUser)
   .get(authenticate, getUser)
   .post(addUser)
   .delete(authenticate, deleteUser);
