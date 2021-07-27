@@ -30,7 +30,7 @@ exports.addUser = async (req, res, next) => {
     // define email
     const msg = {
       to: email,
-      from: "bocu.alexandru@gmail.com", // Use the email address or domain you verified above
+      from: process.env.SENDER_EMAIL, // Use the email address or domain you verified above
       subject: "Greetings from Wir treffen Freunde",
       text: `Please click this link to verify your email address: ${process.env.SERVER_URL}users/verify/${emailToken}`,
     };
@@ -83,7 +83,7 @@ exports.forgotPassword = async (req, res, next) => {
     // define email
     const msg = {
       to: email,
-      from: "mamuna.anwar@gmail.com", // Use the email address or domain you verified above
+      from: process.env.SENDER_EMAIL, // Use the email address or domain you verified above
       subject: "Reset your password for wir treffen freunde",
       text: `Please click this link to verify your email address: ${process.env.FRONTEND_URL}/reset-password/${resetPasswordToken}`,
     };
@@ -99,7 +99,7 @@ exports.forgotPassword = async (req, res, next) => {
 //controller to update the password
 exports.resetPassword = async (req, res) => {
   //here use the same variable that is used in the verify route
-  const { token } = req.body;
+  const { token, password } = req.body;
   console.log("reset password");
   try {
     // find user that has this token
@@ -110,13 +110,16 @@ exports.resetPassword = async (req, res) => {
         runValidators: true,
       }
     );
+    //encrypt password
+    user.password = await bcrypt.hash(password, 10);
+    await user.save();
     if (!user) {
       return res.status(401).json({
         error: new Error("User not found!"),
       });
     }
 
-    //res.send("Your email address has been verified.");
+    res.send("password updated.");
   } catch (err) {
     console.error(err);
   }
@@ -148,8 +151,6 @@ exports.loginUser = async (req, res, next) => {
       res.json({ accessToken: token });
     }
   }
-
-  next();
 };
 
 exports.getUser = async (req, res, next) => {
