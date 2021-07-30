@@ -129,6 +129,7 @@ exports.loginUser = async (req, res, next) => {
   const userCredentials = req.body;
   const inputPassword = userCredentials.password;
   // get user from database
+  console.log(userCredentials);
   const foundUser = await User.findOne({ email: userCredentials.email }).select(
     "+password"
   );
@@ -182,6 +183,7 @@ exports.updateUser = async (req, res, next) => {
       new: true,
       runValidators: true,
     });
+    console.log(req.userId);
     if (!user) throw new createError.NotFound();
     res.status(200).send(user);
   } catch (e) {

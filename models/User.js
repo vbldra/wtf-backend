@@ -39,7 +39,7 @@ const UserSchema = new Schema(
       default: false,
     },
     address: String,
-    trips: [{ title: String, cities: [String], middlePoint: String }],
+    trips: [{ title: String, cities: [String] }],
     memories: [{ title: String, url: String }],
   },
   {

@@ -5,7 +5,7 @@ Content-Type: application/json
   "firstName": "Raluca",
   "lastName": "Stefania",
   "email": "raluca@stefania.com",
-  "password": "parola",
+  "password": "Lov3wins291!",
   "trips": [{
       "title": "MySecondTRip",
       "cities": ["Heidelberg", "Hamburg", "München", "Köln"],
@@ -22,13 +22,28 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBjYzgxZ
 
 PUT http://localhost:8080/users/
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBlMzAzNDU1MmE4ODA5Yzk2MjcwMjI1IiwiaWF0IjoxNjI1NDkwMjk1fQ.YfpTDhBHrC9pcXzE3BURrnyNtyIv3Y9aENhJtmdshEM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBmZTk0NjA0OGI1YWUxZGNmYzcwNjcyIiwiaWF0IjoxNjI3Mjk4OTU3fQ.W6ru4FtlfRU-PNh4oNTtJSPtziRwmCm7xAk-BNaDfoQ
 
 {
   "trips": [{
-      "title": "MySecondTRip",
-      "cities": ["Heidelberg", "Hamburg", "München", "Köln"],
-      "middlePoint": "Regensburg"
+      "title": "My First Trip",
+      "cities": ["Heidelberg", "Hamburg", "Muenchen", "Koeln"]
+      },
+      {
+      "title": "My Second Trip",
+      "cities": ["Berlin", "Barcelona", "Paris"]
+      },
+      {
+      "title": "Unforgettable Trip",
+      "cities": ["Regensburg", "Berlin", "Passau", "Ulm"]
+      },
+      {
+      "title": "BIG Trip",
+      "cities": ["New York", "Dubai", "Tokyo", "Berlin"]
+      },
+      {
+      "title": "RO Trip",
+      "cities": ["Aglasterhausen", "Oradea", "Philadelphia", "Borozel"]
       }]
 }
 
@@ -38,11 +53,11 @@ POST http://localhost:8080/users/login
 Content-Type: application/json
 
 {
-  "email": "raluca@stefania.com",
-  "password": "parola"
+  "email": "raluca@bochis.com",
+  "password": "Lov3wins291!"
 }
 
 ###
 
 GET  http://localhost:8080/users/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBlMzAzNDU1MmE4ODA5Yzk2MjcwMjI1IiwiaWF0IjoxNjI1NDkwMjk1fQ.YfpTDhBHrC9pcXzE3BURrnyNtyIv3Y9aENhJtmdshEM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjBmZTk0NjA0OGI1YWUxZGNmYzcwNjcyIiwiaWF0IjoxNjI3Mjk4OTU3fQ.W6ru4FtlfRU-PNh4oNTtJSPtziRwmCm7xAk-BNaDfoQ
