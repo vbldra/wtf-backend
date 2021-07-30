@@ -129,6 +129,7 @@ exports.loginUser = async (req, res, next) => {
   const userCredentials = req.body;
   const inputPassword = userCredentials.password;
   // get user from database
+  console.log(userCredentials);
   const foundUser = await User.findOne({ email: userCredentials.email }).select(
     "+password"
   );
